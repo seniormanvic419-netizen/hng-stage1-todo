@@ -1,0 +1,7 @@
+name = "hng-stage1-todo"
+compatibility_date = "2026-09-01"
+pages_build_output_dir = "public"
+
+[[kv_namespaces]]
+binding = "TODO_KV"
+id = "f362b658c38e4a4981df9e9cfdfb0e52"

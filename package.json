@@ -1,0 +1,20 @@
+{
+  "name": "hng-stage1-todo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HNG 15 Stage 1: a To-Do list with notes, due dates, priorities, search, dark mode and drag-and-drop, built with an AI coding agent.",
+  "scripts": {
+    "dev": "wrangler pages dev public --kv TODO_KV",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler pages deploy public --project-name hng-stage1-todo"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.0.0",
+    "@types/node": "^26.6.4",
+    "typescript": "^5.6.0",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.0.0"
+  }
+}

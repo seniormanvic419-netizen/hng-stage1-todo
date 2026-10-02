@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ledger — To-Do with notes</title>
+  <meta name="description" content="A to-do list with notes, due dates, priorities, search, dark mode and drag-and-drop ordering.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () { try { var t = localStorage.getItem("ledger-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#list">Skip to tasks</a>
+
+  <header class="top">
+    <div class="wrap top__row">
+      <h1 class="brand"><span class="brand__mark" aria-hidden="true">✓</span> Ledger</h1>
+      <div class="top__tools">
+        <span class="sync" id="sync" aria-live="polite">Saved</span>
+        <button type="button" class="icon-btn" id="theme" aria-label="Switch to dark mode" title="Toggle theme">
+          <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="summary" aria-label="Summary">
+      <p class="summary__count" id="summary">No tasks yet</p>
+      <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+    </section>
+
+    <form class="composer" id="composer" autocomplete="off">
+      <label class="visually-hidden" for="new-title">New task</label>
+      <input class="composer__title" id="new-title" name="title" type="text" placeholder="Add a task and press Enter" maxlength="200" required>
+      <div class="composer__row">
+        <label class="field">
+          <span class="field__label">Due</span>
+          <input class="field__input" id="new-due" name="dueDate" type="date">
+        </label>
+        <label class="field">
+          <span class="field__label">Priority</span>
+          <select class="field__input" id="new-priority" name="priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+        <label class="field field--grow">
+          <span class="field__label">Notes</span>
+          <input class="field__input" id="new-notes" name="notes" type="text" placeholder="Optional note" maxlength="5000">
+        </label>
+        <button class="btn btn--primary" type="submit">Add</button>
+      </div>
+    </form>
+
+    <section class="toolbar" aria-label="Search and filter">
+      <label class="search">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="Search tasks and notes" aria-label="Search tasks and notes">
+      </label>
+      <div class="filters" role="group" aria-label="Filter by status">
+        <button type="button" class="chip is-active" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-filter="active" aria-pressed="false">Active</button>
+        <button type="button" class="chip" data-filter="done" aria-pressed="false">Done</button>
+        <button type="button" class="chip" data-filter="overdue" aria-pressed="false">Overdue</button>
+      </div>
+      <label class="field field--inline">
+        <span class="field__label">Priority</span>
+        <select class="field__input" id="filter-priority" aria-label="Filter by priority">
+          <option value="all">Any</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </label>
+      <label class="field field--inline">
+        <span class="field__label">Sort</span>
+        <select class="field__input" id="sort" aria-label="Sort tasks">
+          <option value="manual">Manual (drag)</option>
+          <option value="due">Due date</option>
+          <option value="priority">Priority</option>
+          <option value="created">Newest</option>
+        </select>
+      </label>
+    </section>
+
+    <p class="hint" id="drag-hint">Drag the handle to reorder. Click a task to open its notes.</p>
+
+    <ul class="list" id="list" aria-label="Tasks"></ul>
+
+    <p class="empty" id="empty" hidden>Nothing here. Add a task above, or clear the search and filters.</p>
+
+    <div class="footer-actions">
+      <button type="button" class="btn btn--ghost" id="clear-done">Clear completed</button>
+    </div>
+  </main>
+
+  <template id="task-template">
+    <li class="task" draggable="true">
+      <button type="button" class="task__handle" aria-label="Drag to reorder" title="Drag to reorder">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+      </button>
+      <input class="task__check" type="checkbox" aria-label="Mark done">
+      <div class="task__body">
+        <div class="task__main">
+          <span class="task__title" contenteditable="true" spellcheck="false" role="textbox" aria-label="Task title"></span>
+          <span class="task__meta">
+            <span class="badge badge--priority"></span>
+            <span class="badge badge--due"></span>
+            <span class="badge badge--notes" hidden>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h6"/></svg>
+            </span>
+          </span>
+        </div>
+        <details class="task__details">
+          <summary class="task__summary">Notes</summary>
+          <textarea class="task__notes" rows="3" placeholder="Write a note for this task" maxlength="5000" aria-label="Task notes"></textarea>
+          <div class="task__edit">
+            <label class="field"><span class="field__label">Due</span><input class="field__input task__due" type="date"></label>
+            <label class="field"><span class="field__label">Priority</span>
+              <select class="field__input task__priority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+            </label>
+            <button type="button" class="btn btn--danger task__delete">Delete</button>
+          </div>
+        </details>
+      </div>
+    </li>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
